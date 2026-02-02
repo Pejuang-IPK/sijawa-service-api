@@ -10,4 +10,3 @@ Service ini menyediakan REST API untuk mengelola jadwal perkuliahan, mahasiswa, 
 - Prisma ORM (v6)
 - MySQL
 - REST API (JSON)
-- JWT Authentication (planned)
