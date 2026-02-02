@@ -1,4 +1,3 @@
-📦 README — sijawa-api
 # SIJAWA API
 
 Backend service for **SIJAWA (Sistem Informasi Jadwal Wali Akademik)**.  
