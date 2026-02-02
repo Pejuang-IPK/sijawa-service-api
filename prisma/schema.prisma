@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  // url      = env("DATABASE_URL")
+}
+
+model Mahasiswa {
+  id_mahasiswa Int     @id
+  nama         String? @db.VarChar(255)
+  email        String? @db.VarChar(255)
+  password     String? @db.VarChar(255)
+  foto         String? @db.VarChar(255)
+
+  // Relasi (One-to-Many)
+  jadwal    Jadwal[]
+  keuangan  Keuangan[]
+  mood      Mood[]
+  tugas     Tugas[]
+  langganan Langganan[]
+}
+
+// data enum
+enum JenisTransaksi {
+  Pengeluaran
+  Pemasukan
+}
+
+enum StatusLabel {
+  Masih_Bisa_Ditunda @map("Masih Bisa Ditunda")
+  Tolong_Dikerjakan  @map("Tolong Dikerjakan")
+  Harus_Dikerjakan   @map("Harus Dikerjakan")
+  Terlewat           @map("Terlewat")
+}
+
+model Jadwal {
+  id_jadwal    Int       @id @default(autoincrement())
+  id_mahasiswa Int?
+  hari         String?   @db.VarChar(20)
+  namaMatkul   String?   @db.VarChar(255)
+  jam_mulai    DateTime? @db.Time(0)
+  jam_selesai  DateTime? @db.Time(0)
+  kelasMatkul  String?   @db.VarChar(255)
+  sks          Int?
+  dosenMatkul  String?   @db.VarChar(255)
+
+  // Relasi
+  mahasiswa Mahasiswa? @relation(fields: [id_mahasiswa], references: [id_mahasiswa], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([id_mahasiswa], map: "id_mahasiswa")
+}
+
+model Keuangan {
+  id_keuangan         Int             @id
+  id_mahasiswa        Int?
+  tanggalKeuangan     DateTime?       @db.DateTime(0)
+  saldo               Int?
+  transaksi           Int?
+  keteranganTransaksi String?         @db.VarChar(255)
+  jenisTransaksi      JenisTransaksi?
+  kategoriTransaksi   String?         @db.VarChar(255)
+
+  // Relasi
+  mahasiswa Mahasiswa? @relation(fields: [id_mahasiswa], references: [id_mahasiswa], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([id_mahasiswa], map: "id_mahasiswa")
+}
+
+model Langganan {
+  id_langganan   Int     @id
+  id_mahasiswa   Int
+  nama_langganan String  @db.VarChar(100)
+  icon           String? @default("fa-circle") @db.VarChar(50)
+  harga_bulanan  Int
+
+  // Relasi (Catatan: Di SQL tidak ada constraint FK eksplisit, tapi saya tambahkan untuk memudahkan query)
+  mahasiswa Mahasiswa @relation(fields: [id_mahasiswa], references: [id_mahasiswa], onDelete: NoAction, onUpdate: NoAction)
+  
+  // Jika ingin strict sesuai SQL tanpa relation check, hapus baris 'mahasiswa' di atas 
+  // dan hapus field 'langganan' di model Mahasiswa.
+}
+
+model Mood {
+  id_mood        Int       @id @default(autoincrement())
+  id_mahasiswa   Int?
+  tanggalLogMood DateTime? @db.DateTime(0)
+  waktuMeTime    DateTime? @db.Time(0) // Prisma menghandle TIME sebagai DateTime
+  levelStress    Int?
+  namaKegiatan   String?   @db.VarChar(255)
+
+  // Relasi
+  mahasiswa Mahasiswa? @relation(fields: [id_mahasiswa], references: [id_mahasiswa], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([id_mahasiswa], map: "id_mahasiswa")
+}
+
+model StatusTugas {
+  id_status Int          @id
+  status    StatusLabel? // Menggunakan Enum yang kita definisikan di atas
+
+  // Relasi
+  tugas Tugas[]
+}
+
+model Tugas {
+  id_tugas     Int       @id
+  id_mahasiswa Int?
+  id_status    Int?
+  namaTugas    String?   @db.VarChar(255)
+  matkulTugas  String?   @db.VarChar(255)
+  tenggatTugas DateTime? @db.DateTime(0)
+
+  // Relasi
+  mahasiswa   Mahasiswa?   @relation(fields: [id_mahasiswa], references: [id_mahasiswa], onDelete: NoAction, onUpdate: NoAction)
+  statusTugas StatusTugas? @relation(fields: [id_status], references: [id_status], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([id_mahasiswa], map: "id_mahasiswa")
+  @@index([id_status], map: "id_status")
+}
