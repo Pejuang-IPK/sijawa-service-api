@@ -14,6 +14,19 @@ datasource db {
   // url      = env("DATABASE_URL")
 }
 
+// data enum
+enum JenisTransaksi {
+  Pengeluaran
+  Pemasukan
+}
+
+enum StatusLabel {
+  Masih_Bisa_Ditunda @map("Masih Bisa Ditunda")
+  Tolong_Dikerjakan  @map("Tolong Dikerjakan")
+  Harus_Dikerjakan   @map("Harus Dikerjakan")
+  Terlewat           @map("Terlewat")
+}
+
 model Mahasiswa {
   id_mahasiswa Int     @id
   nama         String? @db.VarChar(255)
@@ -27,19 +40,6 @@ model Mahasiswa {
   mood      Mood[]
   tugas     Tugas[]
   langganan Langganan[]
-}
-
-// data enum
-enum JenisTransaksi {
-  Pengeluaran
-  Pemasukan
-}
-
-enum StatusLabel {
-  Masih_Bisa_Ditunda @map("Masih Bisa Ditunda")
-  Tolong_Dikerjakan  @map("Tolong Dikerjakan")
-  Harus_Dikerjakan   @map("Harus Dikerjakan")
-  Terlewat           @map("Terlewat")
 }
 
 model Jadwal {
@@ -60,7 +60,7 @@ model Jadwal {
 }
 
 model Keuangan {
-  id_keuangan         Int             @id
+  id_keuangan         Int             @id @default(autoincrement())
   id_mahasiswa        Int?
   tanggalKeuangan     DateTime?       @db.DateTime(0)
   saldo               Int?
@@ -76,28 +76,24 @@ model Keuangan {
 }
 
 model Langganan {
-  id_langganan   Int     @id
+  id_langganan   Int     @id @default(autoincrement())
   id_mahasiswa   Int
   nama_langganan String  @db.VarChar(100)
   icon           String? @default("fa-circle") @db.VarChar(50)
   harga_bulanan  Int
 
-  // Relasi (Catatan: Di SQL tidak ada constraint FK eksplisit, tapi saya tambahkan untuk memudahkan query)
   mahasiswa Mahasiswa @relation(fields: [id_mahasiswa], references: [id_mahasiswa], onDelete: NoAction, onUpdate: NoAction)
   
-  // Jika ingin strict sesuai SQL tanpa relation check, hapus baris 'mahasiswa' di atas 
-  // dan hapus field 'langganan' di model Mahasiswa.
 }
 
 model Mood {
   id_mood        Int       @id @default(autoincrement())
   id_mahasiswa   Int?
   tanggalLogMood DateTime? @db.DateTime(0)
-  waktuMeTime    DateTime? @db.Time(0) // Prisma menghandle TIME sebagai DateTime
+  waktuMeTime    DateTime? @db.Time(0)
   levelStress    Int?
   namaKegiatan   String?   @db.VarChar(255)
 
-  // Relasi
   mahasiswa Mahasiswa? @relation(fields: [id_mahasiswa], references: [id_mahasiswa], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([id_mahasiswa], map: "id_mahasiswa")
@@ -105,9 +101,8 @@ model Mood {
 
 model StatusTugas {
   id_status Int          @id
-  status    StatusLabel? // Menggunakan Enum yang kita definisikan di atas
+  status    StatusLabel?
 
-  // Relasi
   tugas Tugas[]
 }
 
@@ -119,7 +114,6 @@ model Tugas {
   matkulTugas  String?   @db.VarChar(255)
   tenggatTugas DateTime? @db.DateTime(0)
 
-  // Relasi
   mahasiswa   Mahasiswa?   @relation(fields: [id_mahasiswa], references: [id_mahasiswa], onDelete: NoAction, onUpdate: NoAction)
   statusTugas StatusTugas? @relation(fields: [id_status], references: [id_status], onDelete: NoAction, onUpdate: NoAction)
 
