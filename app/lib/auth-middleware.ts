@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
+type HandlerFunction = (
+  req: NextRequest,
+  context: any,
+) => Promise<NextResponse>;
+
 export function verifyJWT(token: string) {
   try {
     const decoded = jwt.verify(
@@ -13,8 +18,8 @@ export function verifyJWT(token: string) {
   }
 }
 
-export function withAuth(handler: Function) {
-  return async (request: NextRequest) => {
+export function withAuth(handler: HandlerFunction) {
+  return async (request: NextRequest, context: any) => {
     try {
       const authHeader = request.headers.get("Authorization");
 
@@ -38,7 +43,7 @@ export function withAuth(handler: Function) {
 
       (request as any).mahasiswa = decoded;
 
-      return handler(request);
+      return handler(request, context);
     } catch (error: any) {
       return NextResponse.json(
         { message: "Terjadi kesalahan autentikasi", ok: false },

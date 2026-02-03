@@ -44,7 +44,7 @@ async function createHandler(request: NextRequest) {
 
     if (!hari || !namaMatkul || !jam_mulai || !jam_selesai) {
       return NextResponse.json(
-        { message: "Data hari, matkul, dan jam wajib diisi", ok: false },
+        { message: "Data hari, matkul, dan jam wajib diisi" },
         { status: 400 },
       );
     }
@@ -56,7 +56,6 @@ async function createHandler(request: NextRequest) {
       return NextResponse.json(
         {
           message: "Format jam salah. Gunakan format HH:mm (contoh: 08:30)",
-          ok: false,
         },
         { status: 400 },
       );
@@ -78,7 +77,6 @@ async function createHandler(request: NextRequest) {
     return NextResponse.json(
       {
         message: "Jadwal berhasil dibuat",
-        ok: true,
         data: newJadwal,
       },
       { status: 201 },
