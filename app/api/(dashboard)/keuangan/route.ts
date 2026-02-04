@@ -105,7 +105,7 @@ async function createKeuangan(request: NextRequest, context: any) {
       saldoBaru = saldoSekarang - nilaiTransaksi;
     }
 
-    // 3. Convert Tanggal & Simpan
+    // Convert Tanggal
     const dateObj = new Date(tanggal);
 
     const newKeuangan = await prisma.keuangan.create({

@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `tugas` MODIFY `id_tugas` INTEGER NOT NULL AUTO_INCREMENT;

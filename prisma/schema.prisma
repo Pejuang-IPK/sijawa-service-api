@@ -100,14 +100,14 @@ model Mood {
 }
 
 model StatusTugas {
-  id_status Int          @id
+  id_status Int          @id @default(autoincrement())
   status    StatusLabel?
 
   tugas Tugas[]
 }
 
 model Tugas {
-  id_tugas     Int       @id
+  id_tugas     Int       @id @default(autoincrement())
   id_mahasiswa Int?
   id_status    Int?
   namaTugas    String?   @db.VarChar(255)
